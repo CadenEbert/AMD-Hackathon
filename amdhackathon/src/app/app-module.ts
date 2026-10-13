@@ -3,7 +3,7 @@ import { BrowserModule, provideClientHydration, withEventReplay } from '@angular
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
-import { DashboardPage } from './dashboard-page/dashboard-page';
+import { DashboardPage } from './dashboard/dashboard-page/dashboard-page';
 
 @NgModule({
   declarations: [App, DashboardPage],
