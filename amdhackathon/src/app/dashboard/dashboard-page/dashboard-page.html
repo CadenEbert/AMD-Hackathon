@@ -6,5 +6,47 @@
 
   </div>
 
-  <button (click)="testData()">Test Data</button>
+
+  <div class="ticket-filtering">
+    <label class="filter-label">
+      Sort by:
+      <select [(ngModel)]="sortOption" (change)="onSortOptionChange($event)">
+        <option value="date">Longest Since Open</option>
+        <option value="category">Category</option>
+        <option value="severity">Severity Level (Highest to Lowest)</option>
+        <option value="severityAsc">Severity Level (Lowest to Highest)</option>
+      </select>
+    </label>
+
+
+    <label class="filter-label">
+      Filter by Resolved Status:
+      <select [(ngModel)]="resolvedFilter" (change)="onResolvedFilterChange($event)">
+        <option value="unresolved">Unresolved</option>
+        <option value="resolved">Resolved</option>
+        <option value="all">All</option>
+
+      </select>
+    </label>
+
+  </div>
+
+
+
+  <div class="tickets">
+
+
+
+    <mat-card *ngFor="let ticket of tickets$ | async" class="ticket-card">
+      <mat-card-header>
+        <mat-card-title>{{ ticket.category }}</mat-card-title>
+
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ ticket.description }}</p>
+      </mat-card-content>
+
+    </mat-card>
+  </div>
+
 </div>

@@ -14,10 +14,13 @@ export class DashboardService {
   private ticketSubject = new BehaviorSubject<Ticket[]>([]);
   tickets$ = this.ticketSubject.asObservable();
 
+  private categorySubject = new BehaviorSubject<string[]>([]);
+  categories$ = this.categorySubject.asObservable();
+
   private teamSubject = new BehaviorSubject<Team[]>([]);
   teams$ = this.teamSubject.asObservable();
 
-  
+
 
   loadDashboardData(companyId: number): void {
     this.loadTickets(companyId);
