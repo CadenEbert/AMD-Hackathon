@@ -6,6 +6,7 @@ export interface Ticket {
     category: string;
     assignedTeamId: number;
     description: string;
+    time_active: string;
     severity_score: number;
     resolved: boolean;
 }

@@ -2,6 +2,8 @@ const client = require('../supabase').client;
 
 
 
+
+
 // GET /api/tickets/:companyId
 exports.getTickets = async (req, res) => {
   try {
@@ -10,15 +12,81 @@ exports.getTickets = async (req, res) => {
     console.log('Received companyId:', companyId);
     const { data, error } = await client
       .from('tickets')
-      .select('*');
+      .select(`
+        id,
+        company_id,
+        category_id,
+        issue_category (
+        category,
+        description
+        ),
+        description,
+        severity_score,
+        resolved,
+        assigned_team,
+        created_at,
+        teams (
+          id,
+          description,
+          supervisors_email,
+          name
+      ),
+        companies(
+          company_name
+      )
+
+        `)
+      .eq('company_id', companyId);
 
     if (error) {
       console.error('Supabase error:', error);
       return res.status(500).json({ error: error.message });
     }
 
+    const tickets = data.map((row) => {
+      const elapsedMs = Math.max(
+        0,
+        Date.now() - new Date(row.created_at).getTime()
+      );
 
-    return res.status(200).json(data);
+      const totalMinutes = Math.floor(elapsedMs / 60000);
+      const days = Math.floor(totalMinutes / 1440);
+      const hours = Math.floor((totalMinutes % 1440) / 60);
+      const minutes = totalMinutes % 60;
+
+      let timeActive;
+      if (days > 0) {
+        timeActive = `${days}d ${hours}h`;
+      } else if (hours > 0) {
+        timeActive = `${hours}h ${minutes}m`;
+      } else {
+        timeActive = `${minutes}m`;
+      }
+
+      return {
+        ticketId: row.id,
+        companyId: row.company_id,
+        companyName: row.companies.company_name,
+        categoryId: row.category_id,
+        categoryDescription: row.issue_category?.description ?? '',
+        category: row.issue_category.category,
+        assignedTeamId: row.assigned_team,
+        description: row.description,
+        created_at: row.created_at,
+        time_active: timeActive,
+        severity_score: row.severity_score,
+        resolved: row.resolved,
+        team: {
+          id: row.teams?.id ?? '',
+          name: row.teams?.name ?? '',
+          description: row.teams?.description ?? '',
+          supervisors_email: row.teams?.supervisors_email ?? '',
+        },
+      };
+    });
+
+    console.log('Fetched tickets:', tickets);
+    return res.status(200).json(tickets);
   } catch (error) {
     console.error('Error fetching tickets:', error);
     res.status(500).json({ error: 'An error occurred while fetching tickets' });
