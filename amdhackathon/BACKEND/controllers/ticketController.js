@@ -54,6 +54,11 @@ exports.getTickets = async (req, res) => {
       const hours = Math.floor((totalMinutes % 1440) / 60);
       const minutes = totalMinutes % 60;
 
+      let dateCreated = new Date(row.created_at);
+      let formattedDate = dateCreated.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
       let timeActive;
       if (days > 0) {
         timeActive = `${days}d ${hours}h`;
@@ -66,13 +71,13 @@ exports.getTickets = async (req, res) => {
       return {
         ticketId: row.id,
         companyId: row.company_id,
-        companyName: row.companies.company_name,
+        companyName: row.companies?.company_name ?? '',
         categoryId: row.category_id,
         categoryDescription: row.issue_category?.description ?? '',
-        category: row.issue_category.category,
+        category: row.issue_category?.category ?? '',
         assignedTeamId: row.assigned_team,
         description: row.description,
-        created_at: row.created_at,
+        created_at: formattedDate,
         time_active: timeActive,
         severity_score: row.severity_score,
         resolved: row.resolved,

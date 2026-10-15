@@ -31,19 +31,35 @@
 
   </div>
 
+  <div class="ticket-description">
+    <p class="ticket-text">Category</p>
+    <p class="ticket-text">Description</p>
+    <p class="ticket-text">Severity</p>
+    <p class="ticket-text">Time Active</p>
+    <p class="ticket-text">Date Created</p>
+    <p class="ticket-text">Team Assigned</p>
+
+  </div>
+
 
 
   <div class="tickets">
 
 
-
-    <mat-card *ngFor="let ticket of tickets$ | async" class="ticket-card">
+    <mat-card *ngFor="let ticket of filteredTickets$ | async" class="ticket-card">
       <mat-card-header>
         <mat-card-title>{{ ticket.category }}</mat-card-title>
 
       </mat-card-header>
       <mat-card-content>
         <p>{{ ticket.description }}</p>
+
+        <div class="severity-bar" [ngClass]="getSeverityClass(ticket.severity_score)">
+          <p>Severity Score: {{ ticket.severity_score }}</p>
+        </div>
+
+        <p>Time Active: {{ ticket.time_active }}</p>
+        <p>Date Created: {{ ticket.created_at }}</p>
       </mat-card-content>
 
     </mat-card>

@@ -9,4 +9,5 @@ export interface Ticket {
     time_active: string;
     severity_score: number;
     resolved: boolean;
+    created_at: string;
 }
