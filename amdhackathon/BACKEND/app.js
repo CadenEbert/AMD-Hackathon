@@ -7,5 +7,6 @@ app.use(express.json());
 app.use('/api', require('./routes/ticket.js'));
 app.use('/api', require('./routes/teams.js'));
 app.use('/api', require('./routes/severityLevels.js'));
+app.use('/api', require('./routes/audio.js'));
 
 module.exports = app;
