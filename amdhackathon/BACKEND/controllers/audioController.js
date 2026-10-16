@@ -1,7 +1,7 @@
 const client = require('../supabase').client;
 
-// POST /api/ingest/call/:companyId
-exports.ingestCall = async (req, res) => {
+// POST /api/audio/call/:companyId
+exports.audioCall = async (req, res) => {
   try {
     const companyId = req.params.companyId;
 
