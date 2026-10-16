@@ -7,7 +7,8 @@ exports.getTeams = async (req, res) => {
         console.log('Received companyId for teams:', companyId);
         const { data, error } = await client
             .from('teams')
-            .select('*');
+            .select('*')
+            .eq('company_id', companyId);
 
         if (error) {
             console.error('Supabase error:', error);
