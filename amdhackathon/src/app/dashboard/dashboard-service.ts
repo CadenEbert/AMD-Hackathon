@@ -38,4 +38,8 @@ export class DashboardService {
       this.teamSubject.next(teams);
     });
   }
+
+  updateTicket(companyId: number, ticketId: number, updatedData: Partial<Ticket>): Observable<Ticket> {
+    return this.http.patch<Ticket>(`${this.url}/tickets/${companyId}/${ticketId}`, updatedData);
+  }
 }

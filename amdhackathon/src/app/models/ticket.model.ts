@@ -19,4 +19,8 @@ export interface Ticket {
   severity_score: number;
   resolved: boolean;
   team: Team;
+  openCount: number;
+  resolvedCount: number;
+  averageTimeToResolve: number;
+  averageSeverity: number;
 }
