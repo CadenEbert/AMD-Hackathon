@@ -12,7 +12,6 @@
       Sort by:
       <select [(ngModel)]="sortOption" (change)="onSortOptionChange($event)">
         <option value="date">Longest Since Open</option>
-        <option value="category">Category</option>
         <option value="severity">Severity Level (Highest to Lowest)</option>
         <option value="severityAsc">Severity Level (Lowest to Highest)</option>
       </select>
@@ -32,13 +31,12 @@
   </div>
 
   <div class="ticket-description">
-    <p class="ticket-text">Category</p>
-    <p class="ticket-text">Description</p>
-    <p class="ticket-text">Severity</p>
-    <p class="ticket-text">Time Active</p>
-    <p class="ticket-text">Date Created</p>
-    <p class="ticket-text">Team Assigned</p>
-
+    <p>Category</p>
+    <p>Description</p>
+    <p>Severity</p>
+    <p>Time Active</p>
+    <p>Date Created</p>
+    <p>Team Assigned</p>
   </div>
 
 
@@ -47,19 +45,14 @@
 
 
     <mat-card *ngFor="let ticket of filteredTickets$ | async" class="ticket-card">
-      <mat-card-header>
-        <mat-card-title>{{ ticket.category }}</mat-card-title>
 
-      </mat-card-header>
-      <mat-card-content>
+      <mat-card-content class="ticket-content">
+        <p>{{ ticket.category }}</p>
         <p>{{ ticket.description }}</p>
-
-        <div class="severity-bar" [ngClass]="getSeverityClass(ticket.severity_score)">
-          <p>Severity Score: {{ ticket.severity_score }}</p>
-        </div>
-
-        <p>Time Active: {{ ticket.time_active }}</p>
-        <p>Date Created: {{ ticket.created_at }}</p>
+        <p>{{ ticket.severity_score }}</p>
+        <p>{{ ticket.time_active }}</p>
+        <p>{{ ticket.created_at }}</p>
+        <p>{{ ticket.team.name }}</p>
       </mat-card-content>
 
     </mat-card>
