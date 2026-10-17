@@ -4,6 +4,7 @@ import { BehaviorSubject, Subscription, combineLatest, map } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
 import { DashboardService } from '../dashboard-service';
 
+
 Chart.register(...registerables);
 
 @Component({
@@ -110,7 +111,7 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
             maintainAspectRatio: true,
             animation: false,
             plugins: {
-              legend: { position: 'top' },
+              legend: { position: 'bottom' },
             },
           },
         });
@@ -141,4 +142,18 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
     this.resolvedFilter = (event.target as HTMLSelectElement).value;
     this.resolvedFilterSubject.next(this.resolvedFilter);
   }
+
+  resolveTicket(ticketId: number): void {
+    this.dashboardService.updateTicket(this.companyId,ticketId, { resolved: true }).subscribe({
+      next: (updatedTicket) => {
+        console.log('Ticket resolved:', updatedTicket);
+        this.dashboardService.loadTickets(this.companyId);
+      },
+      error: (error) => {
+        console.error('Error resolving ticket:', error);
+      },
+    });
+  }
+
+
 }

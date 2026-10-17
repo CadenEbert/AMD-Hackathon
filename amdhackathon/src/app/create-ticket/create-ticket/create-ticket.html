@@ -1,0 +1,46 @@
+<div class="ticket-container">
+  <div class="header">
+    <h1 class="h1">Create Ticket</h1>
+
+    <div class="nav">
+      <a routerLink="/dashboard" class="nav-link">Dashboard</a>
+      <a routerLink="/create-team" class="nav-link">Create Team</a>
+      <a routerLink="/create-ticket" class="nav-link">Create Ticket</a>
+      <a routerLink="/create-category" class="nav-link">Create Category</a>
+
+    </div>
+
+
+
+
+  </div>
+
+  <div class="ticket-content">
+
+    <div class="upload-select">
+      <label class="filter-label">
+        Upload Type:
+        <select [(ngModel)]="uploadType">
+          <option *ngFor="let type of uploadType" [value]="type">{{ type }}</option>
+        </select>
+      </label>
+    </div>
+
+
+
+    <div class="ticket-form">
+      <h2 class="h2">Ticket Details</h2>
+      <form>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" [(ngModel)]="ticketTitle" />
+
+        <label for="description">Description:</label>
+        <textarea
+          id="description"
+          name="description"
+          [(ngModel)]="ticketDescription"
+        ></textarea>
+
+        <button type="submit">Submit Ticket</button>
+      </form>
+  </div>

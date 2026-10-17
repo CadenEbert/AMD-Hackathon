@@ -3,6 +3,14 @@
   <div class="header">
     <h1 class="h1">Dashboard</h1>
 
+    <div class="nav">
+      <a routerLink="/dashboard" class="nav-link">Dashboard</a>
+      <a routerLink="/create-team" class="nav-link">Create Team</a>
+      <a routerLink="/create-ticket" class="nav-link">Create Ticket</a>
+      <a routerLink="/create-category" class="nav-link">Create Category</a>
+
+    </div>
+
 
   </div>
 
@@ -102,6 +110,18 @@
         <p>{{ ticket.created_at }}</p>
         <p>{{ ticket.team.name }}</p>
       </mat-card-content>
+
+      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Ticket Options" class="ticket-options-button" [disabled]="ticket.resolved">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="resolveTicket(ticket.ticketId)">
+          <mat-icon>check_circle</mat-icon>
+          <span>Resolve</span>
+        </button>
+
+      </mat-menu>
 
     </mat-card>
   </div>
