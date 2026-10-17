@@ -30,6 +30,51 @@
 
   </div>
 
+
+
+  <div class="chart-container">
+
+
+    <div class="chart-header">
+
+      <h2>Severity Distribution</h2>
+
+      <p class="chart-description">
+        A breakdown of current tickets by severity level, helping identify where
+        attention is needed most.
+      </p>
+
+      <div class="severity-guide">
+        <div>
+          <span class="severity-dot low"></span>
+          <span><strong>Low</strong><small>1-3</small></span>
+        </div>
+
+        <div>
+          <span class="severity-dot medium"></span>
+          <span><strong>Medium</strong><small>4-6</small></span>
+        </div>
+
+        <div>
+          <span class="severity-dot high"></span>
+          <span><strong>High</strong><small>7-10</small></span>
+        </div>
+      </div>
+
+      <div *ngIf="metrics$ | async as metrics" class="dashboard-metrics">
+        <div>Open: {{ metrics.openCount }}</div>
+        <div>Resolved: {{ metrics.resolvedCount }}</div>
+        <div>Average Severity: {{ metrics.averageSeverity }}</div>
+
+      </div>
+    </div>
+
+
+    <div class="chart-visual">
+      <canvas #ticketChart></canvas>
+    </div>
+  </div>
+
   <div class="ticket-description">
     <p>Category</p>
     <p>Description</p>
@@ -41,10 +86,13 @@
 
 
 
+
   <div class="tickets">
 
 
-    <mat-card *ngFor="let ticket of filteredTickets$ | async" class="ticket-card">
+
+    <mat-card *ngFor="let ticket of filteredTickets$ | async"
+      class="ticket-card {{ getSeverityClass(ticket.severity_score) }}">
 
       <mat-card-content class="ticket-content">
         <p>{{ ticket.category }}</p>
@@ -57,5 +105,3 @@
 
     </mat-card>
   </div>
-
-</div>

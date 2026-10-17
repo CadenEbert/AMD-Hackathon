@@ -9,7 +9,6 @@ exports.getTickets = async (req, res) => {
   try {
 
     const companyId = req.params.companyId;
-    console.log('Received companyId:', companyId);
     const { data, error } = await client
       .from('tickets')
       .select(`
@@ -68,6 +67,7 @@ exports.getTickets = async (req, res) => {
         timeActive = `${minutes}m`;
       }
 
+
       return {
         ticketId: row.id,
         companyId: row.company_id,
@@ -90,7 +90,7 @@ exports.getTickets = async (req, res) => {
       };
     });
 
-    console.log('Fetched tickets:', tickets);
+
     return res.status(200).json(tickets);
   } catch (error) {
     console.error('Error fetching tickets:', error);

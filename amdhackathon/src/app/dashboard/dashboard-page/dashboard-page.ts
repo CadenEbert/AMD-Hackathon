@@ -1,8 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, PLATFORM_ID, ViewChild, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { BehaviorSubject, Subscription, combineLatest, map } from 'rxjs';
+import { Chart, registerables } from 'chart.js';
 import { DashboardService } from '../dashboard-service';
-import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
-import { map } from 'rxjs/internal/operators/map';
-import { combineLatest } from 'rxjs/internal/observable/combineLatest';
+
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-dashboard-page',
@@ -10,91 +12,133 @@ import { combineLatest } from 'rxjs/internal/observable/combineLatest';
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.css',
 })
-export class DashboardPage {
+export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
   private dashboardService = inject(DashboardService);
-  sortOption: string = 'date';
+  private platformId = inject(PLATFORM_ID);
+
+  @ViewChild('ticketChart') ticketChart!: ElementRef<HTMLCanvasElement>;
+
   companyId = 1;
+  sortOption = 'date';
+  resolvedFilter = 'unresolved';
+
   categories$ = this.dashboardService.categories$;
   tickets$ = this.dashboardService.tickets$;
   teams$ = this.dashboardService.teams$;
-  resolvedFilter: string = 'unresolved';
 
+  private resolvedFilterSubject = new BehaviorSubject<string>(this.resolvedFilter);
+  private sortSubject = new BehaviorSubject<string>(this.sortOption);
 
-  private resolvedFilterSubject = new BehaviorSubject<string>(
-    this.resolvedFilter
-  );
+  private severityChart?: Chart;
+  private sub?: Subscription;
 
   filteredTickets$ = combineLatest([
     this.tickets$,
     this.resolvedFilterSubject,
+    this.sortSubject,
   ]).pipe(
-    map(([tickets, filter]) => {
-      const filteredTickets = tickets.filter((ticket) => {
+    map(([tickets, filter, sort]) => {
+      const result = tickets.filter((ticket) => {
         if (filter === 'all') return true;
         if (filter === 'resolved') return ticket.resolved === true;
         return ticket.resolved === false;
       });
-      return [...filteredTickets].sort(
-        (a, b) =>
-          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+
+      if (sort === 'severity') {
+        return result.sort((a, b) => b.severity_score - a.severity_score);
+      }
+      if (sort === 'severityAsc') {
+        return result.sort((a, b) => a.severity_score - b.severity_score);
+      }
+      return result.sort(
+        (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
       );
     })
   );
 
+  metrics$ = this.tickets$.pipe(
+    map((tickets) => {
+      const resolvedTickets = tickets.filter((ticket) => ticket.resolved);
+      const openTickets = tickets.filter((ticket) => !ticket.resolved);
 
+      const averageSeverity =
+        tickets.length > 0
+          ? tickets.reduce((sum, ticket) => sum + ticket.severity_score, 0) /
+          tickets.length
+          : 0;
 
-
+      return {
+        openCount: openTickets.length,
+        resolvedCount: resolvedTickets.length,
+        averageSeverity: Number(averageSeverity.toFixed(1)),
+      };
+    })
+  );
 
   ngOnInit(): void {
     this.dashboardService.loadDashboardData(this.companyId);
+  }
 
+  ngAfterViewInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    this.sub = this.filteredTickets$.subscribe((tickets) => {
+      const low = tickets.filter((t) => t.severity_score < 4).length;
+      const medium = tickets.filter(
+        (t) => t.severity_score >= 4 && t.severity_score < 7
+      ).length;
+      const high = tickets.filter((t) => t.severity_score >= 7).length;
+      const chartData = [low, medium, high];
+
+      if (!this.severityChart) {
+        this.severityChart = new Chart(this.ticketChart.nativeElement, {
+          type: 'pie',
+          data: {
+            labels: ['Low Severity', 'Medium Severity', 'High Severity'],
+            datasets: [
+              {
+                label: 'Severity Distribution',
+                data: chartData,
+                backgroundColor: ['#5cf6a9', '#f9d067', '#fd2251'],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            animation: false,
+            plugins: {
+              legend: { position: 'top' },
+            },
+          },
+        });
+      } else {
+        this.severityChart.data.datasets[0].data = chartData;
+        this.severityChart.update();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
+    this.severityChart?.destroy();
   }
 
   getSeverityClass(score: number): string {
-    if (score >= 7) return 'high-severity';
-    if (score >= 4) return 'medium-severity';
-    return 'low-severity';
+    if (score >= 7) return 'ticket-card-red';
+    if (score >= 4) return 'ticket-card-yellow';
+    return 'ticket-card-green';
   }
 
   onSortOptionChange(event: Event): void {
-    const selectElement = event.target as HTMLSelectElement;
-    this.sortOption = selectElement.value;
-    this.filteredTickets$ = combineLatest([
-      this.tickets$,
-      this.resolvedFilterSubject,
-    ]).pipe(
-      map(([tickets, filter]) => {
-        let filteredTickets = tickets.filter((ticket) => {
-          if (filter === 'all') return true;
-          if (filter === 'resolved') return ticket.resolved === true;
-          return ticket.resolved === false;
-        });
-
-        if (this.sortOption === 'date') {
-          return filteredTickets.sort(
-            (a, b) =>
-              new Date(a.created_at).getTime() -
-              new Date(b.created_at).getTime()
-          );
-        } else if (this.sortOption === 'severity') {
-          return filteredTickets.sort(
-            (a, b) => b.severity_score - a.severity_score
-          );
-        } else if (this.sortOption === 'severityAsc') {
-          return filteredTickets.sort(
-            (a, b) => a.severity_score - b.severity_score
-          );
-        }
-        return filteredTickets;
-      })
-    );
-
-
+    this.sortOption = (event.target as HTMLSelectElement).value;
+    this.sortSubject.next(this.sortOption);
   }
 
   onResolvedFilterChange(event: Event): void {
-    const selectElement = event.target as HTMLSelectElement;
-    this.resolvedFilter = selectElement.value;
+    this.resolvedFilter = (event.target as HTMLSelectElement).value;
     this.resolvedFilterSubject.next(this.resolvedFilter);
   }
 }
