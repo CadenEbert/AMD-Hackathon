@@ -28,14 +28,22 @@ export class DashboardPage {
     this.tickets$,
     this.resolvedFilterSubject,
   ]).pipe(
-    map(([tickets, filter]) =>
-      tickets.filter((ticket) => {
+    map(([tickets, filter]) => {
+      const filteredTickets = tickets.filter((ticket) => {
         if (filter === 'all') return true;
         if (filter === 'resolved') return ticket.resolved === true;
         return ticket.resolved === false;
-      })
-    )
+      });
+      return [...filteredTickets].sort(
+        (a, b) =>
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      );
+    })
   );
+
+
+
+
 
   ngOnInit(): void {
     this.dashboardService.loadDashboardData(this.companyId);
@@ -51,8 +59,36 @@ export class DashboardPage {
   onSortOptionChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     this.sortOption = selectElement.value;
-    console.log('tickets$:', this.tickets$);
-    console.log('teams$:', this.teams$);
+    this.filteredTickets$ = combineLatest([
+      this.tickets$,
+      this.resolvedFilterSubject,
+    ]).pipe(
+      map(([tickets, filter]) => {
+        let filteredTickets = tickets.filter((ticket) => {
+          if (filter === 'all') return true;
+          if (filter === 'resolved') return ticket.resolved === true;
+          return ticket.resolved === false;
+        });
+
+        if (this.sortOption === 'date') {
+          return filteredTickets.sort(
+            (a, b) =>
+              new Date(a.created_at).getTime() -
+              new Date(b.created_at).getTime()
+          );
+        } else if (this.sortOption === 'severity') {
+          return filteredTickets.sort(
+            (a, b) => b.severity_score - a.severity_score
+          );
+        } else if (this.sortOption === 'severityAsc') {
+          return filteredTickets.sort(
+            (a, b) => a.severity_score - b.severity_score
+          );
+        }
+        return filteredTickets;
+      })
+    );
+
 
   }
 
