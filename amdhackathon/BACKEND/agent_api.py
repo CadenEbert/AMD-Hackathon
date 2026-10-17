@@ -1,5 +1,7 @@
 import os
+import json
 import uuid
+import asyncio
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -13,6 +15,7 @@ from google.adk.sessions import InMemorySessionService
 from google.genai import types
 
 from support_agent.agent import root_agent
+from support_agent.agent_tools.rubric_tool import supabase
 
 APP_NAME = "support_agent"
 
@@ -32,11 +35,17 @@ runner = Runner(agent=root_agent, app_name=APP_NAME, session_service=session_ser
 
 
 class ChatRequest(BaseModel):
-    message: str = Field(..., min_length=1, description="The user's message to the agent")
+    company_id: int
+    message: str = Field(..., min_length=1, description="The support message to classify")
 
 
 class ChatResponse(BaseModel):
-    reply: str
+    company_id: int
+    category_id: int
+    description: str
+    severity_score: int
+    resolve: bool
+    assigned_team: int
 
 
 @app.get("/health")
@@ -48,22 +57,52 @@ def health():
 async def chat(req: ChatRequest):
     user_id = "anonymous"
     session_id = str(uuid.uuid4())
+    reply = ""
 
     try:
         await session_service.create_session(
             app_name=APP_NAME, user_id=user_id, session_id=session_id
         )
 
-        content = types.Content(role="user", parts=[types.Part(text=req.message)])
+        text = f"company_id: {req.company_id}\nmessage: {req.message}"
+        content = types.Content(role="user", parts=[types.Part(text=text)])
 
-        reply = ""
         async for event in runner.run_async(
             user_id=user_id, session_id=session_id, new_message=content
         ):
             if event.is_final_response() and event.content and event.content.parts:
                 reply = event.content.parts[0].text or ""
 
-        return ChatResponse(reply=reply)
+        result = json.loads(reply)
+
+        # Don't trust the model for these
+        result["description"] = req.message
+        result["company_id"] = req.company_id
+        result["resolve"] = False
+
+        # Only the columns you send; id and created_at fill in automatically
+        row = {
+            "company_id": result["company_id"],
+            "category_id": result["category_id"],
+            "description": result["description"],
+            "severity_score": result["severity_score"],
+            "resolved": result["resolve"],
+            "assigned_team": result["assigned_team"],
+        }
+
+        try:
+            inserted = await asyncio.to_thread(
+                lambda: supabase.table("tickets").insert(row).execute()
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Classified, but failed to save: {e}")
+
+        return ChatResponse(**result)
+
+    except HTTPException:
+        raise
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail=f"Agent did not return valid JSON: {reply}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Agent error: {e}")
     finally:
