@@ -3,6 +3,14 @@
   <div class="header">
     <h1 class="h1">Dashboard</h1>
 
+    <div class="nav">
+      <a routerLink="/dashboard" class="nav-link">Dashboard</a>
+      <a routerLink="/create-team" class="nav-link">Create Team</a>
+      <a routerLink="/create-ticket" class="nav-link">Create Ticket</a>
+      <a routerLink="/create-category" class="nav-link">Create Category</a>
+
+    </div>
+
 
   </div>
 
@@ -12,7 +20,6 @@
       Sort by:
       <select [(ngModel)]="sortOption" (change)="onSortOptionChange($event)">
         <option value="date">Longest Since Open</option>
-        <option value="category">Category</option>
         <option value="severity">Severity Level (Highest to Lowest)</option>
         <option value="severityAsc">Severity Level (Lowest to Highest)</option>
       </select>
@@ -31,38 +38,90 @@
 
   </div>
 
-  <div class="ticket-description">
-    <p class="ticket-text">Category</p>
-    <p class="ticket-text">Description</p>
-    <p class="ticket-text">Severity</p>
-    <p class="ticket-text">Time Active</p>
-    <p class="ticket-text">Date Created</p>
-    <p class="ticket-text">Team Assigned</p>
 
+
+  <div class="chart-container">
+
+
+    <div class="chart-header">
+
+      <h2>Severity Distribution</h2>
+
+      <p class="chart-description">
+        A breakdown of current tickets by severity level, helping identify where
+        attention is needed most.
+      </p>
+
+      <div class="severity-guide">
+        <div>
+          <span class="severity-dot low"></span>
+          <span><strong>Low</strong><small>1-3</small></span>
+        </div>
+
+        <div>
+          <span class="severity-dot medium"></span>
+          <span><strong>Medium</strong><small>4-6</small></span>
+        </div>
+
+        <div>
+          <span class="severity-dot high"></span>
+          <span><strong>High</strong><small>7-10</small></span>
+        </div>
+      </div>
+
+      <div *ngIf="metrics$ | async as metrics" class="dashboard-metrics">
+        <div>Open: {{ metrics.openCount }}</div>
+        <div>Resolved: {{ metrics.resolvedCount }}</div>
+        <div>Average Severity: {{ metrics.averageSeverity }}</div>
+
+      </div>
+    </div>
+
+
+    <div class="chart-visual">
+      <canvas #ticketChart></canvas>
+    </div>
   </div>
+
+  <div class="ticket-description">
+    <p>Category</p>
+    <p>Description</p>
+    <p>Severity</p>
+    <p>Time Active</p>
+    <p>Date Created</p>
+    <p>Team Assigned</p>
+  </div>
+
 
 
 
   <div class="tickets">
 
 
-    <mat-card *ngFor="let ticket of filteredTickets$ | async" class="ticket-card">
-      <mat-card-header>
-        <mat-card-title>{{ ticket.category }}</mat-card-title>
 
-      </mat-card-header>
-      <mat-card-content>
+    <mat-card *ngFor="let ticket of filteredTickets$ | async"
+      class="ticket-card {{ getSeverityClass(ticket.severity_score) }}">
+
+      <mat-card-content class="ticket-content">
+        <p>{{ ticket.category }}</p>
         <p>{{ ticket.description }}</p>
-
-        <div class="severity-bar" [ngClass]="getSeverityClass(ticket.severity_score)">
-          <p>Severity Score: {{ ticket.severity_score }}</p>
-        </div>
-
-        <p>Time Active: {{ ticket.time_active }}</p>
-        <p>Date Created: {{ ticket.created_at }}</p>
+        <p>{{ ticket.severity_score }}</p>
+        <p>{{ ticket.time_active }}</p>
+        <p>{{ ticket.created_at }}</p>
+        <p>{{ ticket.team.name }}</p>
       </mat-card-content>
+
+      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Ticket Options" class="ticket-options-button" [disabled]="ticket.resolved">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="resolveTicket(ticket.ticketId)">
+          <mat-icon>check_circle</mat-icon>
+          <span>Resolve</span>
+        </button>
+
+      </mat-menu>
 
     </mat-card>
   </div>
-
-</div>

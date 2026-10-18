@@ -1,13 +1,26 @@
+export interface Team {
+  id: number;
+  name: string;
+  description: string;
+  supervisors_email: string;
+}
+
 export interface Ticket {
-    tickerId: number;
-    companyId: number;
-    companyName: string;
-    categoryId: number;
-    category: string;
-    assignedTeamId: number;
-    description: string;
-    time_active: string;
-    severity_score: number;
-    resolved: boolean;
-    created_at: string;
+  ticketId: number;
+  companyId: number;
+  companyName: string;
+  categoryId: number;
+  categoryDescription: string;
+  category: string;
+  assignedTeamId: number;
+  description: string;
+  created_at: string;
+  time_active: string;
+  severity_score: number;
+  resolved: boolean;
+  team: Team;
+  openCount: number;
+  resolvedCount: number;
+  averageTimeToResolve: number;
+  averageSeverity: number;
 }

@@ -25,6 +25,7 @@
     "@angular/ssr": "^21.2.3",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.3",
+    "chart.js": "^4.5.1",
     "cors": "^2.8.6",
     "express": "^5.1.0",
     "multer": "^2.4.0",

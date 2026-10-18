@@ -4,7 +4,6 @@ const client = require('../supabase').client;
 exports.getTeams = async (req, res) => {
     try {
         const companyId = req.params.companyId;
-        console.log('Received companyId for teams:', companyId);
         const { data, error } = await client
             .from('teams')
             .select('*')
