@@ -3,3 +3,4 @@ uvicorn
 python-dotenv
 supabase
 google-adk==2.12.0
+mutagen
