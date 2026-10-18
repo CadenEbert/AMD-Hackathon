@@ -21,24 +21,39 @@
       <label class="filter-label">
         Upload Type:
         <select [(ngModel)]="uploadType">
-          <option *ngFor="let type of uploadType" [value]="type">{{ type }}</option>
+          <option value="text">Text</option>
+          <option value="audio">Audio</option>
         </select>
       </label>
     </div>
 
 
 
-    <div class="ticket-form">
+    <div class="ticket-form" *ngIf="uploadType === 'text'">
       <form class="form">
 
 
-        <label for="description">Description:</label>
-        <textarea
-          id="description"
-          name="description"
-          [(ngModel)]="ticketDescription"
-        ></textarea>
+        <h1 class="form-header">Ticket Description</h1>
+        <textarea id="description" name="description" [(ngModel)]="ticketDescription"
+          class="description-form"></textarea>
 
-        <button (click)="createTicket(1, ticketDescription)" type="submit">Submit Ticket</button>
+        <button (click)="createTicket(1, ticketDescription)" class="submit-button" [disabled]="uploading">
+          {{ uploading ? 'Submitting...' : 'Submit Ticket' }}
+        </button>
       </form>
+    </div>
+
+    <div class="ticket-form" *ngIf="uploadType === 'audio'">
+      <form class="audio-form">
+        <h1 class="form-header">Upload Audio File</h1>
+
+        <input class="audio-input" type="file" accept="audio/*" (change)="onAudioFileSelected($event)" />
+        <p *ngIf="selectedAudioFile">Selected file: {{ selectedAudioFile.name }}</p>
+
+        <button class="submit-button" (click)="createAudioTicket(1, selectedAudioFile)" [disabled]="uploading">
+          {{ uploading ? 'Submitting...' : 'Submit Ticket' }}
+        </button>
+      </form>
+    </div>
   </div>
+</div>

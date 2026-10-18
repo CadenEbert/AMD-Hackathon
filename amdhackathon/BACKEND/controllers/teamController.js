@@ -53,7 +53,8 @@ exports.getTeam = async (req, res) => {
 exports.createTeam = async (req, res) => {
   try {
     const companyId = req.params.companyId;
-    const { name, description, supervisors_email } = req.body;
+    const { name, supervisors_email, description } = req.body;
+    console.log('Received request body:', req.body);
 
     if (!name) {
       return res.status(400).json({ error: 'name is required' });

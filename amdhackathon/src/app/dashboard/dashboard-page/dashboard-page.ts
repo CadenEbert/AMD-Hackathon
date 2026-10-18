@@ -39,6 +39,7 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
     this.sortSubject,
   ]).pipe(
     map(([tickets, filter, sort]) => {
+
       const result = tickets.filter((ticket) => {
         if (filter === 'all') return true;
         if (filter === 'resolved') return ticket.resolved === true;
@@ -88,6 +89,7 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.dashboardService.loadDashboardData(this.companyId);
+
   }
 
   ngAfterViewInit(): void {
@@ -96,11 +98,11 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.sub = this.filteredTickets$.subscribe((tickets) => {
-      const low = tickets.filter((t) => t.severity_score < 4).length;
+      const low = tickets.filter((t) => t.severity_score < 3).length;
       const medium = tickets.filter(
-        (t) => t.severity_score >= 4 && t.severity_score < 7
+        (t) => t.severity_score >= 3 && t.severity_score < 5
       ).length;
-      const high = tickets.filter((t) => t.severity_score >= 7).length;
+      const high = tickets.filter((t) => t.severity_score >= 5).length;
       const chartData = [low, medium, high];
 
       if (!this.severityChart) {
@@ -138,8 +140,8 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getSeverityClass(score: number): string {
-    if (score >= 7) return 'ticket-card-red';
-    if (score >= 4) return 'ticket-card-yellow';
+    if (score >= 5) return 'ticket-card-red';
+    if (score >= 3) return 'ticket-card-yellow';
     return 'ticket-card-green';
   }
 
@@ -154,7 +156,7 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   resolveTicket(ticketId: number): void {
-    this.dashboardService.updateTicket(this.companyId,ticketId, { resolved: true }).subscribe({
+    this.dashboardService.updateTicket(this.companyId, ticketId, { resolved: true }).subscribe({
       next: (updatedTicket) => {
         console.log('Ticket resolved:', updatedTicket);
         this.dashboardService.loadTickets(this.companyId);

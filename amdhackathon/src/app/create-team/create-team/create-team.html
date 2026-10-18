@@ -1,6 +1,6 @@
 <div class="team-container">
   <div class="header">
-    <h1 class="h1">Create Team</h1>
+    <h1 class="h1">Create team</h1>
 
     <div class="nav">
       <a routerLink="/dashboard" class="nav-link">Dashboard</a>
@@ -9,4 +9,32 @@
       <a routerLink="/create-category" class="nav-link">Create Category</a>
 
     </div>
-</div>
+
+  </div>
+
+
+    <div class="team-content">
+
+      <div class="team-form">
+        <form class="form">
+
+          <h1 class="form-header">Team Name</h1>
+          <input id="name" name="name" [(ngModel)]="teamName"
+            class="name-form" />
+
+            <h1 class="form-header">Supervisor Email</h1>
+          <input id="supervisor-email" name="supervisor-email" [(ngModel)]="supervisorEmail"
+            class="name-form" />
+
+          <h1 class="form-header">Team Description</h1>
+          <textarea id="description" name="description" [(ngModel)]="teamDescription"
+            class="description-form"></textarea>
+
+          <button (click)="createTeam(1, teamName, supervisorEmail, teamDescription)" class="submit-button" [disabled]="uploading$ | async">
+            {{ (uploading$ | async) ? 'Submitting...' : 'Submit Team' }}
+          </button>
+        </form>
+      </div>
+
+    </div>
+
