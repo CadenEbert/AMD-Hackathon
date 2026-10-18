@@ -20,6 +20,7 @@
       Sort by:
       <select [(ngModel)]="sortOption" (change)="onSortOptionChange($event)">
         <option value="date">Longest Since Open</option>
+        <option value="dateDesc">Most Recent</option>
         <option value="severity">Severity Level (Highest to Lowest)</option>
         <option value="severityAsc">Severity Level (Lowest to Highest)</option>
       </select>

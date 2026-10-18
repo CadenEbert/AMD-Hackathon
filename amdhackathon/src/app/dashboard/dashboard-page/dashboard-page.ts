@@ -45,6 +45,16 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
         return ticket.resolved === false;
       });
 
+      if (sort === 'date') {
+        return result.sort(
+          (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+      }
+      if (sort === 'dateDesc') {
+        return result.sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      }
       if (sort === 'severity') {
         return result.sort((a, b) => b.severity_score - a.severity_score);
       }

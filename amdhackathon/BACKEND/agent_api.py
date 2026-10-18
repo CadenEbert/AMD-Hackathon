@@ -59,6 +59,8 @@ async def chat(req: ChatRequest):
     session_id = str(uuid.uuid4())
     reply = ""
 
+    print(f"Processing chat request: {req}")
+
     try:
         await session_service.create_session(
             app_name=APP_NAME, user_id=user_id, session_id=session_id
@@ -97,6 +99,7 @@ async def chat(req: ChatRequest):
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Classified, but failed to save: {e}")
 
+        print(f"Ticket saved: {inserted}")
         return ChatResponse(**result)
 
     except HTTPException:

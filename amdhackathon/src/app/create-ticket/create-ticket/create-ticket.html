@@ -29,10 +29,8 @@
 
 
     <div class="ticket-form">
-      <h2 class="h2">Ticket Details</h2>
-      <form>
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title" [(ngModel)]="ticketTitle" />
+      <form class="form">
+
 
         <label for="description">Description:</label>
         <textarea
@@ -41,6 +39,6 @@
           [(ngModel)]="ticketDescription"
         ></textarea>
 
-        <button type="submit">Submit Ticket</button>
+        <button (click)="createTicket(1, ticketDescription)" type="submit">Submit Ticket</button>
       </form>
   </div>
