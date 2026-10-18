@@ -9,4 +9,28 @@
       <a routerLink="/create-category" class="nav-link">Create Category</a>
 
     </div>
-</div>
+
+  </div>
+
+
+    <div class="category-content">
+
+      <div class="category-form">
+        <form class="form">
+
+          <h1 class="form-header">Category Name</h1>
+          <input id="name" name="name" [(ngModel)]="categoryName"
+            class="name-form" />
+
+          <h1 class="form-header">Category Description</h1>
+          <textarea id="description" name="description" [(ngModel)]="categoryDescription"
+            class="description-form"></textarea>
+
+          <button (click)="createCategory(1, categoryName, categoryDescription)" class="submit-button" [disabled]="uploading$ | async">
+            {{ (uploading$ | async) ? 'Submitting...' : 'Submit Category' }}
+          </button>
+        </form>
+      </div>
+
+    </div>
+
