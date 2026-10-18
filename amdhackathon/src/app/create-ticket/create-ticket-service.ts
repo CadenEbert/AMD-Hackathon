@@ -23,7 +23,7 @@ export class CreateTicketService {
         const formData = new FormData();
         formData.append('company_id', companyId.toString());
         formData.append('audio', audioFile);
-        return this.http.post(`${this.backendUrl}/audio/call/${companyId}`, formData);
+        return this.http.post(`${this.backendUrl}/api/audio/call/${companyId}`, formData);
     }
 
 }
