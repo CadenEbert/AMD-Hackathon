@@ -31,7 +31,7 @@
             class="description-form"></textarea>
 
           <button (click)="createTeam(1, teamName, supervisorEmail, teamDescription)" class="submit-button" [disabled]="uploading$ | async">
-            {{ (uploading$ | async) ? 'Submitting...' : 'Submit Category' }}
+            {{ (uploading$ | async) ? 'Submitting...' : 'Submit Team' }}
           </button>
         </form>
       </div>
