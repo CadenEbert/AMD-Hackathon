@@ -7,6 +7,6 @@ const audioController = require('../controllers/audioController.js');
 const upload = multer({ limits: { fileSize: 50 * 1024 * 1024 } });
 
 router.post('/audio/call/:companyId', upload.single('audio'), audioController.audioCall);
-router.get('audio/call/status/:id', audioController.callStatus);
+router.get('/audio/call/status/:id', audioController.callStatus);
 
 module.exports = router;
