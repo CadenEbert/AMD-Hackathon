@@ -59,4 +59,49 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
+  gap: 10px;
+}
+
+.audio-input {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+
+.audio-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 50px;
+}
+
+.description-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 60%;
+  height: 400px;
+  gap: 10px;
+}
+
+.submit-button {
+  background-color: #c0f8a6;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.submit-button:hover {
+  background-color: #a0e8a6;
+}
+
+.submit-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }

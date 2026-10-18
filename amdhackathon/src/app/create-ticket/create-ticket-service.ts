@@ -6,6 +6,7 @@ import { inject, Injectable } from '@angular/core';
 })
 export class CreateTicketService {
     url: string = 'http://localhost:8000';
+    backendUrl: string = 'http://localhost:3000';
     private http = inject(HttpClient);
 
     constructor() {}
@@ -18,6 +19,11 @@ export class CreateTicketService {
         return this.http.post(`${this.url}/chat`, { company_id: companyId, message: messageData });
     }
 
-
+    createAudioTicket(companyId: number, audioFile: File) {
+        const formData = new FormData();
+        formData.append('company_id', companyId.toString());
+        formData.append('audio', audioFile);
+        return this.http.post(`${this.backendUrl}/audio/call/${companyId}`, formData);
+    }
 
 }
